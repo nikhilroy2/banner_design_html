@@ -48,12 +48,15 @@
         .hamburger { display: none; font-size: 1.5rem; color: #fff; cursor: pointer;}
 
         /* -- Asymmetrical Split Layout Engine -- */
-        .hero { display: flex; height: 100vh; min-height: 700px; width: 100vw; position: relative; }
+        .hero { display: flex; min-height: 100vh; height: auto; width: 100vw; position: relative; }
         
         /* Left Typography Pane */
         .left-pane {
-            flex: 0 0 45%; height: 100%; 
+            flex: 0 0 50%; /* Extended slightly to give text more horizontal room */
+            min-height: 100vh; height: auto;
             display: flex; flex-direction: column; justify-content: center;
+            padding-top: 160px; /* Massive buffer to mathematically prevent colliding with the logo */
+            padding-bottom: 120px;
             padding-left: clamp(30px, 5vw, 80px); 
             padding-right: 5%;
             z-index: 20; position: relative;
@@ -61,7 +64,7 @@
 
         /* Right Image Pane with Architectural Diagonal Cut */
         .right-pane {
-            position: absolute; right: 0; top: 0; bottom: 0; width: 62%;
+            position: absolute; right: 0; top: 0; bottom: 0; width: 55%;
             clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
             z-index: 10;
             background: #222; overflow: hidden;
@@ -95,20 +98,25 @@
         .kicker::before { content: ''; width: 40px; height: 2px; background: var(--accent); }
 
         .main-title {
-            display: block; /* Explicitly block to prevent flexbox from squishing text nodes */
-            font-size: clamp(3rem, 6.5vw, 7rem); font-weight: 900; line-height: 1.1;
+            display: block; 
+            /* Scaled down max-size slightly so it breathes beautifully on standard 1080p monitors */
+            font-size: clamp(2.5rem, 5vw, 5.5rem); 
+            font-weight: 900; 
+            line-height: 1.25; /* Increased line-height to separate words cleanly */
             text-transform: uppercase; letter-spacing: -2px; margin-bottom: 35px;
             color: #fff;
             animation: fadeInUP 1s cubic-bezier(0.165, 0.84, 0.44, 1) both;
-            position: relative; z-index: 30; /* Ensure text overlaps cut on massive screens */
+            position: relative; z-index: 30; 
         }
         
         /* The visually impressive Stroke Outline layout */
         .main-title .outline {
-            -webkit-text-stroke: 2px #fff; color: transparent;
-            transition: color 0.4s ease;
+            -webkit-text-stroke: 2px #fff; 
+            /* Fill with background color to hide Montserrat's internal vector overlapping artifacts (the small inner triangles) */
+            color: var(--dark); 
+            transition: color 0.4s ease, -webkit-text-stroke 0.4s ease;
         }
-        .main-title:hover .outline { color: rgba(255,255,255,0.15); } /* Micro-interaction */
+        .main-title:hover .outline { color: #fff; -webkit-text-stroke: 2px transparent;} 
         
         .subtitle { 
             font-size: 1.15rem; line-height: 1.7; color: #a1a1aa; 
@@ -162,7 +170,7 @@
         /* Large abstract slide tracker */
         .slide-counter { 
             position: absolute; left: -10px; bottom: 50px; 
-            font-weight: 800; font-size: 15vw; color: rgba(255,255,255,0.02); 
+            font-weight: 800; font-size: clamp(8rem, 15vw, 15rem); color: rgba(255,255,255,0.02); 
             line-height: 1; pointer-events: none; font-family: 'Montserrat', sans-serif;
             z-index: 10;
         }
@@ -174,16 +182,16 @@
         /* -- Mobile Responsiveness -- */
         @media (max-width: 1024px) {
             body { overflow-y: auto; overflow-x: hidden; height: auto; }
-            .hero { flex-direction: column; height: auto; min-height: 100vh; display: flex; }
+            .hero { flex-direction: column; height: auto; display: flex; position: relative;}
             .nav-menu, .contact-group { display: none; }
             .hamburger { display: block; }
             
             .header { padding: 30px clamp(20px, 4vw, 40px); }
 
-            /* Top content section now fixed to stack properly without overlap */
+            /* Top Content Section */
             .left-pane { 
                 width: 100%; flex: 1; 
-                padding: 120px clamp(20px, 5vw, 50px) 50px clamp(20px, 5vw, 50px); 
+                padding: 140px clamp(20px, 5vw, 50px) 50px clamp(20px, 5vw, 50px); 
                 order: 1; height: auto; min-height: auto;
             }
             
@@ -195,7 +203,7 @@
             }
             
             .slider-nav { bottom: 30px; top: auto; right: 20px; position: absolute; }
-            .slide-counter { font-size: 40vw; top: 80px; bottom: auto; left: 10px; }
+            .slide-counter { font-size: 40vw; top: 80px; bottom: auto; left: 10px; z-index: 0;}
             .btn-primary, .btn-outline { width: 100%; display: flex; justify-content: center; text-align: center; }
         }
     </style>
