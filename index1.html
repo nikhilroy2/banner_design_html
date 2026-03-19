@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protector - Premium Interactive Hero Redesign</title>
+    
+    <!-- FontAwesome for original site icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts for premium typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --dark-color: #1a1a1a;
+            --light-color: #ffffff;
+            --accent-color: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--light-color);
+            color: var(--dark-color);
+            overflow-x: hidden;
+        }
+
+        /* --- Top Contact Bar --- */
+        .top-bar {
+            background-color: #2b2b2b;
+            color: #d1d1d1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: clamp(0.7rem, 1vw, 0.8rem);
+            height: clamp(30px, 4vw, 40px);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 20;
+        }
+        
+        .top-bar-left { display: flex; align-items: center; padding-left: 2rem; gap: 20px; flex-wrap: wrap; }
+        .top-bar-left span { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+        .top-bar-right { display: flex; align-items: center; height: 100%; }
+        
+        .linkedin-icon {
+            padding: 0 20px;
+            color: #fff;
+            font-size: 1rem;
+            border-right: 1px solid #444;
+            transition: color 0.3s;
+        }
+        .linkedin-icon:hover { color: #aaa; }
+        
+        .contact-btn-top {
+            background-color: #000;
+            color: #fff;
+            text-transform: uppercase;
+            text-decoration: none;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-size: clamp(0.6rem, 1vw, 0.75rem);
+            transition: background 0.3s;
+        }
+        .contact-btn-top:hover { background-color: #222; }
+
+        /* --- Main Navigation (Sticky and Smooth) --- */
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 clamp(1rem, 3vw, 2.5rem);
+            height: clamp(60px, 8vw, 90px);
+            background: #fff;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 20;
+            transition: all 0.3s ease;
+        }
+        
+        .logo {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #000;
+            text-decoration: none;
+            position: relative;
+        }
+        .logo::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 3px; background: #000; transition: width 0.3s;
+        }
+        .logo:hover::after { width: 100%; }
+
+        .nav-links {
+            display: flex;
+            gap: clamp(15px, 2vw, 35px);
+            list-style: none;
+            padding-top: 5px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #222;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .nav-links a:hover { color: #888; }
+        .nav-links a i { font-size: 0.65rem; padding-top: 2px; }
+
+        .nav-icons { display: flex; align-items: center; gap: clamp(10px, 2vw, 25px); font-size: 1.1rem; color: #222; }
+        .nav-icons i { cursor: pointer; transition: color 0.3s, transform 0.3s; }
+        .nav-icons i:hover { color: #888; transform: translateY(-3px); }
+
+        .hamburger {
+            display: none;
+            font-size: 1.6rem;
+            color: #222;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: transform 0.3s;
+        }
+        .hamburger:active { transform: scale(0.9); }
+
+        /* --- Dynamic Hero Section --- */
+        .hero {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - clamp(60px, 8vw, 90px));
+            min-height: 650px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+            background: #000;
+            padding: 0 15px;
+        }
+
+        .bg-layers { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
+        .hero-bg-layer {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover; background-position: center;
+            opacity: 0; transform: scale(1.03);
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 8s linear;
+        }
+        .hero-bg-layer.active { opacity: 1; transform: scale(1); }
+        .hero::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+            z-index: 1;
+        }
+
+        /* Improved Brand Brackets */
+        .hero-brackets {
+            position: absolute;
+            top: clamp(15px, 4vw, 50px); 
+            left: clamp(15px, 4vw, 50px); 
+            right: clamp(15px, 4vw, 50px); 
+            bottom: clamp(15px, 4vw, 50px);
+            z-index: 2;
+            pointer-events: none;
+            animation: fadeIn 1s ease 0.5s both;
+        }
+        
+        .bracket {
+            position: absolute;
+            width: clamp(30px, 8vw, 70px); 
+            height: clamp(30px, 8vw, 70px);
+            border: clamp(3px, 0.6vw, 6px) solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+            transition: border-color 0.3s;
+        }
+        
+        .b-tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+        .b-tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+        .b-bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+        .b-br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+        /* --- Hero Content Main Texts --- */
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            max-width: 1400px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeInUP 1s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+            padding-bottom: clamp(0px, 15vh, 180px); /* Lift above slider */
+        }
+
+        .kicker {
+            color: #fff;
+            font-size: clamp(1.1rem, 3vw, 2rem);
+            font-weight: 500;
+            margin-bottom: clamp(15px, 3vw, 25px);
+            letter-spacing: clamp(1px, 0.2vw, 1.5px);
+            text-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        .main-headline {
+            color: #fff;
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 800;
+            letter-spacing: clamp(2px, 0.5vw, 5px);
+            line-height: 1.2;
+            text-transform: uppercase;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(10px, 2vw, 25px);
+            cursor: default;
+            width: 100%;
+        }
+
+        .main-headline span.word {
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .main-headline span.word:hover { transform: scale(1.05); color: #e0e0e0; }
+
+        .headline-divider {
+            font-weight: 300;
+            opacity: 0.9;
+            font-size: clamp(2.5rem, 6.5vw, 5.5rem);
+            color: #e0e0e0;
+            transform: translateY(-4px); 
+            text-shadow: none; 
+        }
+
+        .hero-actions {
+            margin-top: clamp(30px, 5vw, 50px);
+            display: flex;
+            justify-content: center;
+            gap: clamp(15px, 2vw, 25px);
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: clamp(12px, 2vw, 18px) clamp(25px, 4vw, 45px);
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .btn-primary { background-color: #fff; color: #000; }
+        .btn-primary:after { content:''; position: absolute; top:0; left:-100%; width:100%; height:100%; background:rgba(0,0,0,0.05); transition:all 0.3s; }
+        .btn-primary:hover:after { left: 0; }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.3);
+        }
+
+        .btn-outline {
+            background-color: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            color: #fff;
+            border-color: #fff;
+        }
+        .btn-outline:hover { background-color: #fff; color: #000; transform: translateY(-3px); }
+
+        /* --- PREMUIM GLASSMORPHISM MINI SLIDER --- */
+        .mini-slider {
+            position: absolute;
+            bottom: clamp(15px, 4vw, 40px);
+            right: clamp(15px, 4vw, 40px);
+            z-index: 10;
+            width: clamp(280px, 90vw, 340px);
+            background: rgba(15, 15, 15, 0.45);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: clamp(12px, 3vw, 18px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            color: #fff;
+            animation: fadeIn 1s ease 1s both;
+        }
+        
+        .mini-slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: clamp(10px, 2vw, 15px);
+        }
+        
+        .mini-slider-title {
+            font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ddd;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 10px;
+        }
+
+        .slider-controls { display: flex; gap: 8px; flex-shrink: 0; }
+        .slider-controls button {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            width: clamp(26px, 4vw, 30px); 
+            height: clamp(26px, 4vw, 30px); 
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .slider-controls button:hover {
+            background: white; 
+            color: black; 
+            transform: scale(1.1);
+        }
+
+        /* Fixed Thumbnails Responsiveness */
+        .thumbnails {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            width: 100%;
+        }
+
+        .thumb {
+            width: 100%;
+            aspect-ratio: 3 / 2; /* Forces perfect proportional scaling! */
+            height: auto;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            opacity: 0.5;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .thumb.active {
+            border-color: #fff;
+            opacity: 1;
+            transform: scale(1.05); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        
+        .thumb:hover:not(.active) { opacity: 0.9; transform: scale(1.02); }
+
+        .slider-progress-bar {
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+            margin-top: 15px;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        .slider-progress-fill { height: 100%; background: #fff; width: 0%; transition: width 0.1s linear; }
+
+        /* --- Animations --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInUP { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Media Queries for Layout Transformations --- */
+        @media (max-width: 1024px) {
+            .hamburger { display: block; }
+            .nav-links {
+                position: fixed;
+                top: clamp(60px, 8vw, 90px);
+                left: -100%;
+                width: 100vw;
+                height: calc(100vh - clamp(60px, 8vw, 90px));
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 30px;
+                padding-bottom: 10vh;
+                transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+            }
+            .nav-links.show-menu { left: 0; }
+            .nav-links a { font-size: 1.2rem; }
+            .main-headline span.word { display: block; width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar { display: none; } 
+            
+            .hero { padding-top: 60px; }
+            
+            /* Center the slider naturally without using 'transform' */
+            /* Using transform here would break the 'transform: translateY(0)' inside fadeInUP animation */
+            .mini-slider {
+                left: 0;
+                right: 0;
+                margin: 0 auto;
+                width: calc(100% - 30px);
+                max-width: 400px;
+            }
+            
+            .main-headline { flex-direction: column; gap: 8px; }
+            .headline-divider { display: none; }
+            
+            .hero-actions { width: 100%; flex-direction: column; max-width: 320px; }
+            .btn { width: 100%; }
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span><i class="fa-solid fa-location-crosshairs"></i> Southern Highlands</span>
+            <span><i class="fa-solid fa-phone"></i> 1300585787</span>
+            <span class="d-none-sm"><i class="fa-regular fa-envelope"></i> sales@protector.com</span>
+        </div>
+        <div class="top-bar-right">
+            <a href="#" class="linkedin-icon"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="#" class="contact-btn-top">Contact Us</a>
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <a href="#" class="logo">PROTECTOR</a>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Products <i class="fa-solid fa-chevron-down"></i></a></li>
+            <li><a href="#">Engineering</a></li>
+            <li><a href="#">Projects <i class="fa-solid fa-chevron-down"></i></a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+        <div class="nav-icons">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-regular fa-user"></i>
+            <i class="fa-solid fa-bag-shopping"></i>
+            <!-- Responsive Menu Hamburger -->
+            <div class="hamburger" id="hamburger-btn">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        
+        <div class="bg-layers" id="bg-layers">
+            <!-- Layers injected by JS -->
+        </div>
+
+        <div class="hero-brackets">
+            <div class="bracket b-tl"></div>
+            <div class="bracket b-tr"></div>
+            <div class="bracket b-bl"></div>
+            <div class="bracket b-br"></div>
+        </div>
+        
+        <div class="hero-content">
+            <div class="kicker">Saving Nature For</div>
+            
+            <h1 class="main-headline">
+                <span class="word hover-txt">OUR PEOPLE</span> 
+                <span class="headline-divider">|</span> 
+                <span class="word hover-txt">OUR PLANET</span> 
+                <span class="headline-divider">|</span> 
+                <span class="word hover-txt">OUR FUTURE</span>
+            </h1>
+            
+            <div class="hero-actions">
+                <a href="#" class="btn btn-primary">Explore Solutions</a>
+                <a href="#" class="btn btn-outline">View Projects</a>
+            </div>
+        </div>
+
+        <div class="mini-slider" id="mini-slider">
+            <div class="mini-slider-header">
+                <span class="mini-slider-title" id="slider-title">Project Deployments</span>
+                <div class="slider-controls">
+                    <button id="slider-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button id="slider-next"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Fixed Layout Grid Container -->
+            <div class="thumbnails" id="slider-thumbs">
+                <!-- Thumbs injected by JS -->
+            </div>
+            
+            <div class="slider-progress-bar">
+                <div class="slider-progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- UI/UX Interactive Scripts -->
+    <script>
+        /* --- Mobile Navigation Logic --- */
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const navLinks = document.getElementById('nav-links');
+        const hamburgerIcon = hamburgerBtn.querySelector('i');
+
+        hamburgerBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('show-menu');
+            if (navLinks.classList.contains('show-menu')) {
+                hamburgerIcon.classList.remove('fa-bars');
+                hamburgerIcon.classList.add('fa-xmark');
+            } else {
+                hamburgerIcon.classList.remove('fa-xmark');
+                hamburgerIcon.classList.add('fa-bars');
+            }
+        });
+
+        // Close menu when a link is clicked
+        const navLinkElements = document.querySelectorAll('.nav-links a');
+        navLinkElements.forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('show-menu');
+                hamburgerIcon.classList.remove('fa-xmark');
+                hamburgerIcon.classList.add('fa-bars');
+            });
+        });
+
+        /* --- Image Slider Logic --- */
+        const slideData = [
+            { src: 'images/1 - IMG_8872.jpeg', title: 'Coastal Defense Systems' },
+            { src: 'images/Caymus.jpg', title: 'Industrial Pipeline Protection' },
+            { src: 'images/7 - IMG_8879.jpeg', title: 'Geotechnical Stabilization' },
+            { src: 'images/8 - IMG_8880.jpeg', title: 'Asset Deployment Protocol' }
+        ];
+        
+        let currentIndex = 0;
+        const bgContainer = document.getElementById('bg-layers');
+        const thumbContainer = document.getElementById('slider-thumbs');
+        const sliderTitle = document.getElementById('slider-title');
+        const progressFill = document.getElementById('progress-fill');
+        
+        const SLIDE_DURATION = 6000;
+        let progressInterval;
+        let pStart = Date.now();
+
+        slideData.forEach((slide, index) => {
+            const bgLayer = document.createElement('div');
+            bgLayer.className = `hero-bg-layer ${index === 0 ? 'active' : ''}`;
+            bgLayer.style.backgroundImage = `url('${slide.src}')`;
+            bgLayer.id = `bg-${index}`;
+            bgContainer.appendChild(bgLayer);
+            
+            const thumb = document.createElement('div');
+            thumb.className = `thumb ${index === 0 ? 'active' : ''}`;
+            thumb.style.backgroundImage = `url('${slide.src}')`;
+            // Crucial: Use inner width aspect ratio scaling handled by CSS
+            thumb.onclick = () => goToSlide(index);
+            thumb.id = `thumb-${index}`;
+            thumbContainer.appendChild(thumb);
+        });
+        
+        sliderTitle.innerText = slideData[0].title;
+
+        function goToSlide(index, wasManual = true) {
+            document.getElementById(`bg-${currentIndex}`).classList.remove('active');
+            document.getElementById(`thumb-${currentIndex}`).classList.remove('active');
+            
+            currentIndex = index;
+            
+            document.getElementById(`bg-${currentIndex}`).classList.add('active');
+            document.getElementById(`thumb-${currentIndex}`).classList.add('active');
+            
+            sliderTitle.innerText = slideData[currentIndex].title;
+            
+            if(wasManual) {
+                resetTimer();
+            }
+        }
+
+        function nextSlide(wasManual = true) {
+            let nextIndex = (currentIndex + 1) % slideData.length;
+            goToSlide(nextIndex, wasManual);
+        }
+        
+        function prevSlide() {
+            let prevIndex = (currentIndex - 1 + slideData.length) % slideData.length;
+            goToSlide(prevIndex, true);
+        }
+
+        document.getElementById('slider-next').onclick = () => nextSlide(true);
+        document.getElementById('slider-prev').onclick = prevSlide;
+
+        function updateProgress() {
+            let elapsed = Date.now() - pStart;
+            let percent = (elapsed / SLIDE_DURATION) * 100;
+            if(percent >= 100) {
+                percent = 0;
+                nextSlide(false);
+                pStart = Date.now();
+            }
+            progressFill.style.width = `${percent}%`;
+        }
+
+        function resetTimer() {
+            clearInterval(progressInterval);
+            pStart = Date.now();
+            progressFill.style.width = `0%`;
+            progressInterval = setInterval(updateProgress, 30);
+        }
+
+        resetTimer();
+        
+        const miniSlider = document.getElementById('mini-slider');
+        miniSlider.addEventListener('mouseenter', () => {
+             clearInterval(progressInterval);
+             progressFill.style.opacity = '0.5';
+        });
+        miniSlider.addEventListener('mouseleave', () => {
+             resetTimer();
+             progressFill.style.opacity = '1';
+        });
+    </script>
+
+</body>
+</html>

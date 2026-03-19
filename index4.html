@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protector - Particle Tech Concept</title>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Premium Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --dark: #050508;
+            --accent: #00e5ff; /* Cyan tech accent */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background: var(--dark); 
+            color: #ffffff; 
+            overflow: hidden; 
+            height: 100vh; 
+        }
+
+        /* --- Dynamic Background --- */
+        .bg-container {
+            position: absolute; inset: 0; z-index: 0;
+        }
+        
+        .bg-slide {
+            position: absolute; inset: 0; 
+            background-size: cover; background-position: center;
+            opacity: 0; transition: opacity 2s ease-in-out;
+        }
+        
+        .bg-slide.active { opacity: 1; }
+
+        /* Tech Dark Overlay */
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at center, rgba(5,5,8,0.4) 0%, rgba(5,5,8,0.85) 100%);
+            z-index: 1;
+        }
+
+        /* --- Interactive Particle Canvas --- */
+        #particle-canvas {
+            position: absolute; inset: 0; z-index: 5;
+            pointer-events: auto; /* Allow mouse interaction for repulsion effect */
+        }
+
+        /* --- Floating Header --- */
+        .header {
+            position: absolute; top: 0; left: 0; width: 100%; z-index: 50;
+            padding: clamp(20px, 4vw, 40px) clamp(30px, 5vw, 60px);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-family: 'Syncopate', sans-serif; font-size: 1.8rem; font-weight: 700; color: #fff; text-decoration: none; letter-spacing: 2px;}
+        
+        .nav-actions { display: flex; align-items: center; gap: 30px; }
+        .contact-btn { 
+            background: transparent; border: 1px solid rgba(255,255,255,0.3); padding: 12px 25px; border-radius: 40px; 
+            color: #fff; text-decoration: none; font-size: 0.8rem; font-weight: 700; 
+            text-transform: uppercase; letter-spacing: 1.5px; transition: all 0.3s; 
+            backdrop-filter: blur(5px);
+        }
+        .contact-btn:hover { background: #fff; color: var(--dark); border-color: #fff;}
+
+        /* --- Glassmorphism Center Card --- */
+        .hero-content {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 20; width: 90%; max-width: 900px;
+            background: rgba(15, 15, 20, 0.4);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: clamp(40px, 6vw, 80px) clamp(20px, 5vw, 60px);
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 10px rgba(255,255,255,0.05);
+            animation: fadeIn 1.5s ease 0.5s both;
+        }
+
+        .kicker {
+            color: var(--accent);
+            font-size: clamp(0.85rem, 1.5vw, 1rem); font-weight: 700;
+            letter-spacing: 5px; text-transform: uppercase; margin-bottom: 25px;
+            display: inline-flex; align-items: center; gap: 10px;
+        }
+        .kicker::before, .kicker::after { content: ''; width: 30px; height: 1px; background: rgba(0, 229, 255, 0.5); }
+
+        .headline {
+            font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 800; line-height: 1.2;
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px;
+            color: #ffffff;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .headline span { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.6); }
+
+        .subtitle {
+            font-size: clamp(0.95rem, 1.5vw, 1.15rem); font-weight: 300; line-height: 1.8;
+            color: #b0b0b0; max-width: 600px; margin: 0 auto 40px auto;
+        }
+
+        .hero-actions { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        
+        .btn-main {
+            background: var(--accent); color: var(--dark);
+            padding: 16px 40px; border-radius: 40px; font-weight: 800; font-size: 0.9rem;
+            text-transform: uppercase; letter-spacing: 2px; text-decoration: none;
+            transition: 0.3s; box-shadow: 0 10px 20px rgba(0, 229, 255, 0.2);
+        }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 229, 255, 0.4); background: #fff;}
+        
+        .btn-secondary {
+            background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3);
+            padding: 16px 40px; border-radius: 40px; font-weight: 600; font-size: 0.9rem;
+            text-transform: uppercase; letter-spacing: 1.5px; text-decoration: none;
+            transition: 0.3s; display: flex; align-items: center; gap: 10px;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+        /* Subliminal slide tracker */
+        .slide-indicator {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 10px; z-index: 50;
+        }
+        .dot { width: 30px; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; transition: 0.3s; }
+        .dot.active { background: var(--accent); width: 50px; box-shadow: 0 0 10px var(--accent); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -46%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+
+        @media (max-width: 768px) {
+            .hero-content { width: 95%; padding: 40px 20px; }
+            .btn-main, .btn-secondary { width: 100%; justify-content: center; }
+            .contact-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <a href="#" class="logo">PROTECTOR</a>
+        <div class="nav-actions">
+            <a href="#" class="contact-btn">Speak to an Engineer</a>
+        </div>
+    </header>
+
+    <div class="bg-container" id="bg-container">
+        <!-- Backgrounds injected here -->
+    </div>
+    <div class="hero-overlay"></div>
+
+    <!-- The Unique Graphic Particle Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="hero-content">
+        <div class="kicker">Advanced Environmental Defense</div>
+        
+        <h1 class="headline">
+            OUR PEOPLE<br>
+            <span>OUR PLANET</span><br>
+            OUR FUTURE
+        </h1>
+        
+        <p class="subtitle">Utilizing next-generation structural mechanics and highly intelligent protective infrastructure to secure real-world assets against compounding environmental challenges.</p>
+        
+        <div class="hero-actions">
+            <a href="#" class="btn-main">View Solutions</a>
+            <a href="#" class="btn-secondary"><i class="fa-solid fa-play"></i> Network Overview</a>
+        </div>
+    </div>
+
+    <div class="slide-indicator" id="dots-container"></div>
+
+    <script>
+        // --- Slide Transition Logic ---
+        const slideData = [
+            { src: 'images/1 - IMG_8872.jpeg' },
+            { src: 'images/Caymus.jpg' },
+            { src: 'images/7 - IMG_8879.jpeg' },
+            { src: 'images/8 - IMG_8880.jpeg' }
+        ];
+
+        let currentIndex = 0;
+        const bgContainer = document.getElementById('bg-container');
+        const dotsContainer = document.getElementById('dots-container');
+        
+        slideData.forEach((slide, index) => {
+            const bg = document.createElement('div');
+            bg.className = `bg-slide ${index === 0 ? 'active' : ''}`;
+            bg.style.backgroundImage = `url('${slide.src}')`;
+            bg.id = `bg-${index}`;
+            bgContainer.appendChild(bg);
+
+            const dot = document.createElement('div');
+            dot.className = `dot ${index === 0 ? 'active' : ''}`;
+            dot.id = `dot-${index}`;
+            dotsContainer.appendChild(dot);
+        });
+
+        function nextSlide() {
+            document.getElementById(`bg-${currentIndex}`).classList.remove('active');
+            document.getElementById(`dot-${currentIndex}`).classList.remove('active');
+            currentIndex = (currentIndex + 1) % slideData.length;
+            document.getElementById(`bg-${currentIndex}`).classList.add('active');
+            document.getElementById(`dot-${currentIndex}`).classList.add('active');
+        }
+
+        setInterval(nextSlide, 7000);
+
+        // --- Interactive Particle Grid Logic ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Mouse interaction
+        let mouse = { x: null, y: null, radius: 150 };
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+        window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 1.0;
+                this.vy = (Math.random() - 0.5) * 1.0;
+                this.baseRadius = Math.random() * 2 + 1;
+                this.radius = this.baseRadius;
+            }
+            update() {
+                // Bounce edges
+                if(this.x < 0 || this.x > width) this.vx *= -1;
+                if(this.y < 0 || this.y > height) this.vy *= -1;
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Mouse interaction distance
+                if(mouse.x != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx*dx + dy*dy);
+                    if(distance < mouse.radius) {
+                        // Interactive Push
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (mouse.radius - distance) / mouse.radius;
+                        this.x -= forceDirectionX * force * 3;
+                        this.y -= forceDirectionY * force * 3;
+                    }
+                }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+                ctx.fillStyle = 'rgba(0, 229, 255, 0.6)';
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            let pCount = window.innerWidth < 768 ? 40 : 100;
+            for(let i=0; i<pCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+        initParticles();
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            for(let i=0; i<particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                
+                // Draw connecting lines
+                for(let j = i; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if(dist < 130) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 229, 255, ${0.15 - dist/1000})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
